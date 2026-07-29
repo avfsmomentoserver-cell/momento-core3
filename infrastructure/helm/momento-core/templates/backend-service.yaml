@@ -1,0 +1,25 @@
+# Backend Service Template for Momento Core V5
+
+{{- if .Values.backend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "momento-core.fullname" . }}-backend-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "momento-core.labels" . | nindent 4 }}
+    app: momento-backend
+spec:
+  type: {{ .Values.backend.service.type }}
+  ports:
+  - port: {{ .Values.backend.service.port }}
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  - port: {{ .Values.backend.service.metricsPort }}
+    targetPort: 9090
+    protocol: TCP
+    name: metrics
+  selector:
+    app: momento-backend
+{{- end }}

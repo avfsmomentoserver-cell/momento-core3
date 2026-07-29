@@ -1,0 +1,281 @@
+# V5 Service Mesh - Advanced Traffic Management
+# Istio configuration for traffic splitting, canary deployments, and failover
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: momento-gateway
+  namespace: momento-production
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: momento-tls-cert
+    hosts:
+    - "api.momento.local"
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "api.momento.local"
+    tls:
+      httpsRedirect: true
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: momento-backend
+  namespace: momento-production
+spec:
+  hosts:
+  - "api.momento.local"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1"
+    route:
+    - destination:
+        host: momento-backend
+        subset: v1
+      weight: 90
+    - destination:
+        host: momento-backend
+        subset: v2
+      weight: 10
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 5s
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,connect-failure,refused-stream
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: momento-backend
+  namespace: momento-production
+spec:
+  host: momento-backend
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+    circuitBreaker:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+
+---
+# Canary Deployment Configuration
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: momento-canary
+  namespace: momento-production
+spec:
+  hosts:
+  - "api.momento.local"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - headers:
+        x-canary:
+          exact: "true"
+    route:
+    - destination:
+        host: momento-backend
+        subset: canary
+      weight: 100
+  - route:
+    - destination:
+        host: momento-backend
+        subset: stable
+      weight: 95
+    - destination:
+        host: momento-backend
+        subset: canary
+      weight: 5
+
+---
+# Multi-Region Failover
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: momento-multi-region
+  namespace: momento-production
+spec:
+  host: momento-backend
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: "x-user-id"
+  subsets:
+  - name: primary
+    labels:
+      region: primary
+  - name: secondary
+    labels:
+      region: secondary
+
+---
+# Circuit Breaker for External Services
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: external-services
+  namespace: momento-production
+spec:
+  host: "*.external.com"
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        http1MaxPendingRequests: 25
+        maxRequestsPerConnection: 5
+    circuitBreaker:
+      consecutiveErrors: 3
+      interval: 15s
+      baseEjectionTime: 15s
+      maxEjectionPercent: 30
+    outlierDetection:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 40
+      minHealthPercent: 50
+
+---
+# Rate Limiting
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: momento-ratelimit
+  namespace: momento-production
+spec:
+  workloadSelector:
+    labels:
+      app: momento-backend
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.ratelimit
+        config:
+          domain: momento
+          request_type: external
+          timeout: 0.25s
+          rate_limit_service:
+            grpc_service:
+              envoy_grpc:
+                cluster_name: rate_limit_cluster
+            transport_api_version: V3
+
+---
+# Retry Policy for Database Connections
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: momento-database
+  namespace: momento-production
+spec:
+  hosts:
+  - postgres-primary
+  tcp:
+  - route:
+    - destination:
+        host: postgres-primary
+        port:
+          number: 5432
+    timeout: 10s
+    retries:
+      attempts: 5
+      perTryTimeout: 2s
+      retryOn: connect-failure,refused-stream
+
+---
+# Security Policy
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: momento-default
+  namespace: momento-production
+spec:
+  mtls:
+    mode: STRICT
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: momento-jwt
+  namespace: momento-production
+spec:
+  selector:
+    matchLabels:
+      app: momento-backend
+  jwtRules:
+  - issuer: "https://auth.momento.local"
+    jwksUri: "https://auth.momento.local/.well-known/jwks.json"
+    forwardOriginalToken: true
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: momento-authz
+  namespace: momento-production
+spec:
+  selector:
+    matchLabels:
+      app: momento-backend
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        requestPrincipals:
+        - "https://auth.momento.local/*"
+  to:
+  - operation:
+      methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE

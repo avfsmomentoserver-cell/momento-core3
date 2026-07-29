@@ -1,0 +1,110 @@
+# Vertical Pod Autoscaler Configuration for Momento Core V5
+# V5 Specification: VPA for resource optimization
+
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: momento-backend-vpa
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: momento-backend
+  updatePolicy:
+    updateMode: "Off"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: backend
+      minAllowed:
+        cpu: "250m"
+        memory: "256Mi"
+      maxAllowed:
+        cpu: "4000m"
+        memory: "4Gi"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: momento-frontend-vpa
+  namespace: momento-v5
+  labels:
+    app: momento-frontend
+    version: v5
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: momento-frontend
+  updatePolicy:
+    updateMode: "Off"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: frontend
+      minAllowed:
+        cpu: "100m"
+        memory: "128Mi"
+      maxAllowed:
+        cpu: "2000m"
+        memory: "2Gi"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: postgres-vpa
+  namespace: momento-v5
+  labels:
+    app: postgres
+    version: v5
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: postgres
+  updatePolicy:
+    updateMode: "Off"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: postgres
+      minAllowed:
+        cpu: "500m"
+        memory: "1Gi"
+      maxAllowed:
+        cpu: "8000m"
+        memory: "16Gi"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: redis-vpa
+  namespace: momento-v5
+  labels:
+    app: redis
+    version: v5
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: redis
+  updatePolicy:
+    updateMode: "Off"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: redis
+      minAllowed:
+        cpu: "250m"
+        memory: "512Mi"
+      maxAllowed:
+        cpu: "4000m"
+        memory: "8Gi"
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits

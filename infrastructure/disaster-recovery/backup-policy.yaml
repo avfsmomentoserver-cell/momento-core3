@@ -1,0 +1,185 @@
+# V5 Disaster Recovery - Backup and Restore Policies
+# Automated backup strategies for multi-region deployment
+
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: momento-daily-backup
+  namespace: velero
+spec:
+  schedule: "0 3 * * *"  # Daily at 3 AM
+  template:
+    includedNamespaces:
+    - momento-production
+    excludedResources:
+    - events
+    - pods
+    - persistentvolumeclaims
+    storageLocation: momento-primary-backup
+    volumeSnapshotLocations:
+    - momento-primary-snapshots
+    ttl: 720h  # 30 days retention
+    hooks:
+      resources:
+      - name: pre-backup-hook
+        includedNamespaces:
+        - momento-production
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: database
+        pre:
+          - exec:
+              container: postgres
+              command:
+              - /bin/sh
+              - -c
+              - "pg_dump -U postgres momento > /tmp/pre-backup.sql"
+              onError: Continue
+              timeout: 60s
+        post:
+          - exec:
+              container: postgres
+              command:
+              - /bin/sh
+              - -c
+              - "rm /tmp/pre-backup.sql"
+              onError: Continue
+              timeout: 30s
+
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: momento-hourly-incremental
+  namespace: velero
+spec:
+  schedule: "0 * * * *"  # Hourly
+  template:
+    includedNamespaces:
+    - momento-production
+    includedResources:
+    - configmaps
+    - secrets
+    storageLocation: momento-primary-backup
+    ttl: 168h  # 7 days retention
+
+---
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: momento-primary-backup
+  namespace: velero
+spec:
+  provider: gcp
+  objectStorage:
+    bucket: momento-v5-backups
+    prefix: primary
+  config:
+    region: us-central1
+  credential:
+    name: velero-gcp-credentials
+    key: cloud
+
+---
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: momento-primary-snapshots
+  namespace: velero
+spec:
+  provider: gcp
+  config:
+    region: us-central1
+
+---
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: momento-secondary-backup
+  namespace: velero
+spec:
+  provider: gcp
+  objectStorage:
+    bucket: momento-v5-backups
+    prefix: secondary
+  config:
+    region: us-east1
+  credential:
+    name: velero-gcp-credentials
+    key: cloud
+
+---
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: momento-secondary-snapshots
+  namespace: velero
+spec:
+  provider: gcp
+  config:
+    region: us-east1
+
+---
+# Disaster Recovery Restore Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: disaster-recovery-restore
+  namespace: momento-production
+spec:
+  template:
+    spec:
+      containers:
+      - name: restore
+        image: velero/velero:latest
+        command:
+        - /velero
+        - restore
+        - create
+        - --from-backup
+        - $(BACKUP_NAME)
+        - --namespace-mappings
+        - momento-production:momento-production
+        env:
+        - name: BACKUP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: disaster-recovery-config
+              key: latest-backup
+        volumeMounts:
+        - name: velero-config
+          mountPath: /velero-config
+      volumes:
+      - name: velero-config
+        configMap:
+          name: velero-config
+      restartPolicy: OnFailure
+      backoffLimit: 3
+
+---
+# ConfigMap for DR configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: disaster-recovery-config
+  namespace: momento-production
+data:
+  latest-backup: "latest-available"
+  dr-procedure: |
+    1. Verify secondary region is operational
+    2. Verify network connectivity between regions
+    3. Stop traffic to primary region
+    4. Restore from latest backup to secondary
+    5. Verify data integrity
+    6. Switch DNS to secondary region
+    7. Monitor secondary region stability
+    8. Plan failback procedure
+  failback-procedure: |
+    1. Verify primary region is recovered
+    2. Sync data from secondary to primary
+    3. Verify data consistency
+    4. Stop traffic to secondary region
+    5. Restore traffic to primary region
+    6. Switch DNS back to primary
+    7. Monitor primary region stability
+    8. Resume normal operations

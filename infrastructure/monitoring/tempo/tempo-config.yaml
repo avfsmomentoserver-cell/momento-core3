@@ -1,0 +1,128 @@
+# Tempo Configuration for Momento Core V5
+# V5 Specification: Tempo 2.3+, 7-day retention, 1% sampling
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-config
+  namespace: momento-v5
+  labels:
+    app: tempo
+    version: v5
+data:
+  tempo-config.yaml: |
+    server:
+      http_listen_port: 3200
+      grpc_listen_port: 4317
+
+    distributor:
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:4317
+            http:
+              endpoint: 0.0.0.0:4318
+        jaeger:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:14250
+            thrift_binary:
+              endpoint: 0.0.0.0:6832
+            thrift_compact:
+              endpoint: 0.0.0.0:6831
+            thrift_http:
+              endpoint: 0.0.0.0:14268
+        zipkin:
+          endpoint: 0.0.0.0:9411
+
+    ingester:
+      trace_idle_period: 10s
+      max_block_bytes: 1048576
+      max_block_duration: 5m
+      compaction_block_size: 1000000
+      cutoff_factory:
+        static:
+          cutoff_duration: 168h
+
+    compactor:
+      compaction:
+        block_size: 1000000
+        compacted_block_size: 1000000
+        max_block_bytes: 104857600
+        block_retention: 168h
+        compaction_window: 1h
+        overlap_window: 2h
+
+    metrics_generator:
+      registry:
+        external_labels:
+          cluster: momento-v5
+          source: tempo
+      processor:
+        local_blocks:
+          filter_server_spans: false
+          max_block_bytes: 1048576
+          max_block_duration: 5m
+        service_graphs:
+          enabled: true
+          max_duration: 48h
+        span_metrics:
+          enabled: true
+          dimensions:
+            - service_name
+            - operation
+            - status_code
+          extra_dimensions:
+            - http.method
+            - http.status_code
+      traces_storage:
+        path: /var/tempo/traces
+
+    storage:
+      trace:
+        backend: local
+        local:
+          path: /var/tempo/traces
+        block:
+          bloom_filter_false_positive: 0.05
+          index_downsample_bytes: 1000
+          encoding: zstd
+
+    overrides:
+      defaults:
+        metrics:
+          dimensions:
+            - service_name
+            - http.method
+          histogram_buckets:
+            - 0.1
+            - 0.25
+            - 0.5
+            - 1
+            - 2.5
+            - 5
+            - 10
+        global:
+          per_user_override_config: /etc/tempo/overrides.yaml
+        ingestion:
+          rate_limit:
+            ingestion_burst_size_mb: 30
+            ingestion_rate_mb: 15
+          max_traces_per_user: 10000
+          max_bytes_per_trace: 10485760
+        ingestion_rate_limit:
+          bursts: 50
+          rate: 10
+        traces_per_user:
+          max_traces_per_user: 10000
+        retention:
+          days: 7
+        spins_per_user:
+          max_spins_per_user: 10000
+        tenant_id: anonymous
+        metrics_generator:
+          processors:
+            - service-graphs
+            - span-metrics
+          generate_native_histograms: true

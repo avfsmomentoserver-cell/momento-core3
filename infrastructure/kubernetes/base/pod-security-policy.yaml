@@ -1,0 +1,80 @@
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: momento-restricted
+  namespace: momento-v5
+  labels:
+    app: momento
+    version: v5
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfiles: 'runtime/default'
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1000
+        max: 65535
+  readOnlyRootFilesystem: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: momento-psp-restricted
+  labels:
+    app: momento
+    version: v5
+rules:
+- apiGroups: ['policy']
+  resources: ['podsecuritypolicies']
+  verbs: ['use']
+  resourceNames: ['momento-restricted']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: momento-psp-binding
+  namespace: momento-v5
+  labels:
+    app: momento
+    version: v5
+roleRef:
+  kind: ClusterRole
+  name: momento-psp-restricted
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: momento-backend
+  namespace: momento-v5
+- kind: ServiceAccount
+  name: momento-frontend
+  namespace: momento-v5
+- kind: ServiceAccount
+  name: momento-database
+  namespace: momento-v5
+- kind: ServiceAccount
+  name: momento-redis
+  namespace: momento-v5

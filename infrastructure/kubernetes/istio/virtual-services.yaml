@@ -1,0 +1,155 @@
+# Istio Virtual Services for Momento Core V5
+# V5 Specification: Traffic routing with retries and timeouts
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: momento-backend-virtualservice
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+spec:
+  hosts:
+  - "api.momento.local"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: momento-backend-service
+        subset: v5
+        port:
+          number: 80
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,connect-failure,refused-stream
+    fault:
+      delay:
+        percentage:
+          value: 0
+        fixedDelay: 0s
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: momento-frontend-virtualservice
+  namespace: momento-v5
+  labels:
+    app: momento-frontend
+    version: v5
+spec:
+  hosts:
+  - "momento.local"
+  - "www.momento.local"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: momento-frontend-service
+        subset: v5
+        port:
+          number: 80
+    timeout: 10s
+    retries:
+      attempts: 2
+      perTryTimeout: 5s
+      retryOn: 5xx,connect-failure,refused-stream
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: momento-internal-virtualservice
+  namespace: momento-v5
+  labels:
+    app: momento
+    version: v5
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - momento-internal-gateway
+  http:
+  # Backend service routing
+  - match:
+    - uri:
+        prefix: /backend/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: momento-backend-service
+        port:
+          number: 80
+    timeout: 30s
+  # Frontend service routing
+  - match:
+    - uri:
+        prefix: /frontend/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: momento-frontend-service
+        port:
+          number: 80
+    timeout: 10s
+  # Metrics endpoint
+  - match:
+    - uri:
+        prefix: /metrics/
+    route:
+    - destination:
+        host: momento-backend-service
+        port:
+          number: 9090
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: monitoring-virtualservice
+  namespace: momento-v5
+  labels:
+    app: monitoring
+    version: v5
+spec:
+  hosts:
+  - "prometheus.momento.local"
+  - "grafana.momento.local"
+  - "alertmanager.momento.local"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - authority:
+        exact: prometheus.momento.local
+    route:
+    - destination:
+        host: prometheus
+        port:
+          number: 9090
+  - match:
+    - authority:
+        exact: grafana.momento.local
+    route:
+    - destination:
+        host: grafana
+        port:
+          number: 3000
+  - match:
+    - authority:
+        exact: alertmanager.momento.local
+    route:
+    - destination:
+        host: alertmanager
+        port:
+          number: 9093

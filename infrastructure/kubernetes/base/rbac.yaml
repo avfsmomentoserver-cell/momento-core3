@@ -1,0 +1,136 @@
+---
+# Role for backend service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: momento-backend-role
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: momento-backend-rolebinding
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+subjects:
+- kind: ServiceAccount
+  name: momento-backend
+  namespace: momento-v5
+roleRef:
+  kind: Role
+  name: momento-backend-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# ClusterRole for monitoring access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: momento-metrics-reader
+  labels:
+    app: momento
+    version: v5
+rules:
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: momento-metrics-reader-binding
+  labels:
+    app: momento
+    version: v5
+subjects:
+- kind: ServiceAccount
+  name: momento-backend
+  namespace: momento-v5
+- kind: ServiceAccount
+  name: momento-frontend
+  namespace: momento-v5
+roleRef:
+  kind: ClusterRole
+  name: momento-metrics-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# Role for database service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: momento-database-role
+  namespace: momento-v5
+  labels:
+    app: momento-database
+    version: v5
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets", "persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: momento-database-rolebinding
+  namespace: momento-v5
+  labels:
+    app: momento-database
+    version: v5
+subjects:
+- kind: ServiceAccount
+  name: momento-database
+  namespace: momento-v5
+roleRef:
+  kind: Role
+  name: momento-database-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Role for Redis service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: momento-redis-role
+  namespace: momento-v5
+  labels:
+    app: momento-redis
+    version: v5
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets", "persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: momento-redis-rolebinding
+  namespace: momento-v5
+  labels:
+    app: momento-redis
+    version: v5
+subjects:
+- kind: ServiceAccount
+  name: momento-redis
+  namespace: momento-v5
+roleRef:
+  kind: Role
+  name: momento-redis-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,65 @@
+# Frontend Deployment Template for Momento Core V5
+
+{{- if .Values.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "momento-core.fullname" . }}-frontend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "momento-core.labels" . | nindent 4 }}
+    app: momento-frontend
+    version: v5
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: momento-frontend
+  template:
+    metadata:
+      labels:
+        app: momento-frontend
+        version: v5
+    spec:
+      serviceAccountName: {{ include "momento-core.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.security.podSecurityContext | nindent 8 }}
+      containers:
+      - name: frontend
+        image: {{ include "momento-core.frontend.image" . }}
+        imagePullPolicy: {{ .Values.image.frontend.pullPolicy }}
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: VITE_API_URL
+          value: https://api.{{ .Values.global.domain }}
+        - name: VITE_WS_URL
+          value: wss://api.{{ .Values.global.domain }}/ws
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          {{- toYaml .Values.security.containerSecurityContext | nindent 10 }}
+{{- end }}

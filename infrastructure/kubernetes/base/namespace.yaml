@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: momento-v5
+  labels:
+    name: momento-v5
+    environment: production
+    project: momento-core
+    version: v5
+    istio-injection: enabled
+  annotations:
+    description: "Momento Core V5 Production Namespace"
+    contact: "infrastructure@momento.core"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: momento-backend
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: momento-frontend
+  namespace: momento-v5
+  labels:
+    app: momento-frontend
+    version: v5
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: momento-database
+  namespace: momento-v5
+  labels:
+    app: momento-database
+    version: v5
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: momento-redis
+  namespace: momento-v5
+  labels:
+    app: momento-redis
+    version: v5

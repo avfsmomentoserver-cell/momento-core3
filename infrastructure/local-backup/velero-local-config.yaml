@@ -1,0 +1,155 @@
+# V5 Free-Tier Local Backup Configuration
+# Velero configuration for local storage backup
+
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: momento-local-backup
+  namespace: velero
+spec:
+  provider: aws
+  objectStorage:
+    bucket: momento-v5-local-backups
+    prefix: local
+  config:
+    region: us-east-1
+    s3ForcePathStyle: "true"
+    s3Url: http://minio:9000
+  credential:
+    name: velero-s3-credentials
+    key: cloud
+
+---
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: momento-local-snapshots
+  namespace: velero
+spec:
+  provider: aws
+  config:
+    region: us-east-1
+
+---
+# Daily backup schedule
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: momento-daily-backup
+  namespace: velero
+spec:
+  schedule: "0 3 * * *"  # Daily at 3 AM
+  template:
+    includedNamespaces:
+    - momento-production
+    - momento-staging
+    excludedResources:
+    - events
+    - pods
+    storageLocation: momento-local-backup
+    volumeSnapshotLocations:
+    - momento-local-snapshots
+    ttl: 168h  # 7 days retention
+    hooks:
+      resources:
+      - name: pre-backup-hook
+        includedNamespaces:
+        - momento-production
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: database
+        pre:
+          - exec:
+              container: postgres
+              command:
+              - /bin/sh
+              - -c
+              - "pg_dump -U momento momento > /tmp/pre-backup.sql"
+              onError: Continue
+              timeout: 60s
+
+---
+# Hourly incremental backup
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: momento-hourly-incremental
+  namespace: velero
+spec:
+  schedule: "0 * * * *"  # Hourly
+  template:
+    includedNamespaces:
+    - momento-production
+    includedResources:
+    - configmaps
+    - secrets
+    storageLocation: momento-local-backup
+    ttl: 48h  # 2 days retention
+
+---
+# MinIO for local S3-compatible storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+  namespace: velero
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: velero
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio:latest
+        args:
+        - server
+        - /data
+        env:
+        - name: MINIO_ROOT_USER
+          value: "minioadmin"
+        - name: MINIO_ROOT_PASSWORD
+          value: "minioadmin"
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: minio-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: velero
+spec:
+  selector:
+    app: minio
+  ports:
+  - port: 9000
+    targetPort: 9000
+    name: api
+  - port: 9001
+    targetPort: 9001
+    name: console

@@ -1,0 +1,100 @@
+# Pod Disruption Budget Configuration for Momento Core V5
+# V5 Specification: PDB for high availability during maintenance
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: momento-backend-pdb
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: momento-backend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: momento-frontend-pdb
+  namespace: momento-v5
+  labels:
+    app: momento-frontend
+    version: v5
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: momento-frontend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: postgres-pdb
+  namespace: momento-v5
+  labels:
+    app: postgres
+    version: v5
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: postgres
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: redis-pdb
+  namespace: momento-v5
+  labels:
+    app: redis
+    version: v5
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: redis
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: prometheus-pdb
+  namespace: momento-v5
+  labels:
+    app: prometheus
+    version: v5
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: prometheus
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: grafana-pdb
+  namespace: momento-v5
+  labels:
+    app: grafana
+    version: v5
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: grafana
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: alertmanager-pdb
+  namespace: momento-v5
+  labels:
+    app: alertmanager
+    version: v5
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: alertmanager

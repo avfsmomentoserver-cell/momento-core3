@@ -1,0 +1,109 @@
+# Istio Destination Rules for Momento Core V5
+# V5 Specification: Traffic management with circuit breakers and load balancing
+
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: momento-backend-destination
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+spec:
+  host: momento-backend-service
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+        idleTimeout: 60s
+        h2UpgradePolicy: UPGRADE
+    outlierDetection:
+      consecutiveGatewayFailure: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 50
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v5
+    labels:
+      version: v5
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: momento-frontend-destination
+  namespace: momento-v5
+  labels:
+    app: momento-frontend
+    version: v5
+spec:
+  host: momento-frontend-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        http1MaxPendingRequests: 25
+        http2MaxRequests: 50
+        maxRequestsPerConnection: 5
+        idleTimeout: 30s
+    outlierDetection:
+      consecutiveGatewayFailure: 3
+      interval: 20s
+      baseEjectionTime: 20s
+      maxEjectionPercent: 30
+      minHealthPercent: 60
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v5
+    labels:
+      version: v5
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: postgres-destination
+  namespace: momento-v5
+  labels:
+    app: postgres
+    version: v5
+spec:
+  host: postgres-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    connectionPool:
+      tcp:
+        maxConnections: 50
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: redis-destination
+  namespace: momento-v5
+  labels:
+    app: redis
+    version: v5
+spec:
+  host: redis-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+    tls:
+      mode: DISABLE

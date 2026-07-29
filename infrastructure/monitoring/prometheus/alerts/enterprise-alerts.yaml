@@ -1,0 +1,234 @@
+# V5 Enterprise Monitoring Alerts
+# Advanced alerting rules for multi-region deployment
+
+groups:
+- name: enterprise_health
+  interval: 30s
+  rules:
+  - alert: HighErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+      service: backend
+    annotations:
+      summary: "High error rate detected"
+      description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.instance }}"
+
+  - alert: HighLatency
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+    for: 10m
+    labels:
+      severity: warning
+      service: backend
+    annotations:
+      summary: "High latency detected"
+      description: "P95 latency is {{ $value }}s for {{ $labels.instance }}"
+
+  - alert: HighCPUUsage
+    expr: rate(container_cpu_usage_seconds_total[5m]) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+      component: infrastructure
+    annotations:
+      summary: "High CPU usage"
+      description: "CPU usage is {{ $value | humanizePercentage }} for {{ $labels.pod }}"
+
+  - alert: HighMemoryUsage
+    expr: container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.9
+    for: 5m
+    labels:
+      severity: critical
+      component: infrastructure
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage is {{ $value | humanizePercentage }} for {{ $labels.pod }}"
+
+- name: database_health
+  interval: 30s
+  rules:
+  - alert: DatabaseConnectionPoolExhausted
+    expr: pg_stat_activity_count / pg_settings_max_connections > 0.9
+    for: 5m
+    labels:
+      severity: critical
+      component: database
+    annotations:
+      summary: "Database connection pool exhausted"
+      description: "Connection pool usage is {{ $value | humanizePercentage }}"
+
+  - alert: DatabaseReplicationLag
+    expr: pg_stat_replication_lag_seconds > 30
+    for: 5m
+    labels:
+      severity: warning
+      component: database
+    annotations:
+      summary: "Database replication lag"
+      description: "Replication lag is {{ $value }}s"
+
+  - alert: DatabaseDiskSpaceLow
+    expr: pg_database_size_bytes / pg_database_total_bytes > 0.8
+    for: 10m
+    labels:
+      severity: warning
+      component: database
+    annotations:
+      summary: "Database disk space low"
+      description: "Disk usage is {{ $value | humanizePercentage }}"
+
+- name: redis_health
+  interval: 30s
+  rules:
+  - alert: RedisMemoryHigh
+    expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+    for: 5m
+    labels:
+      severity: warning
+      component: cache
+    annotations:
+      summary: "Redis memory high"
+      description: "Redis memory usage is {{ $value | humanizePercentage }}"
+
+  - alert: RedisConnectionHigh
+    expr: redis_connected_clients > 1000
+    for: 5m
+    labels:
+      severity: warning
+      component: cache
+    annotations:
+      summary: "Redis connections high"
+      description: "Redis has {{ $value }} connected clients"
+
+- name: multi_region_health
+  interval: 30s
+  rules:
+  - alert: PrimaryRegionDown
+    expr: up{region="primary"} == 0
+    for: 2m
+    labels:
+      severity: critical
+      component: infrastructure
+    annotations:
+      summary: "Primary region is down"
+      description: "Primary region {{ $labels.instance }} is not responding"
+
+  - alert: ReplicationLagHigh
+    expr: region_replication_lag_seconds > 60
+    for: 5m
+    labels:
+      severity: warning
+      component: infrastructure
+    annotations:
+      summary: "Replication lag high"
+      description: "Replication lag is {{ $value }}s between regions"
+
+  - alert: DNSFailover
+    expr: dns_failover_count > 0
+    for: 1m
+    labels:
+      severity: critical
+      component: infrastructure
+    annotations:
+      summary: "DNS failover occurred"
+      description: "DNS failover count is {{ $value }}"
+
+- name: gpu_health
+  interval: 30s
+  rules:
+  - alert: GPUMemoryHigh
+    expr: nvidia_gpu_memory_used_bytes / nvidia_gpu_memory_total_bytes > 0.9
+    for: 5m
+    labels:
+      severity: warning
+      component: gpu
+    annotations:
+      summary: "GPU memory high"
+      description: "GPU memory usage is {{ $value | humanizePercentage }}"
+
+  - alert: GPUTemperatureHigh
+    expr: nvidia_gpu_temperature_celsius > 85
+    for: 5m
+    labels:
+      severity: warning
+      component: gpu
+    annotations:
+      summary: "GPU temperature high"
+      description: "GPU temperature is {{ $value }}°C"
+
+  - alert: GPUUtilizationLow
+    expr: nvidia_gpu_utilization_percent < 20
+    for: 15m
+    labels:
+      severity: info
+      component: gpu
+    annotations:
+      summary: "GPU utilization low"
+      description: "GPU utilization is {{ $value }}%"
+
+- name: security_alerts
+  interval: 30s
+  rules:
+  - alert: HighFailedAuthAttempts
+    expr: rate(auth_failures_total[5m]) > 10
+    for: 5m
+    labels:
+      severity: warning
+      component: security
+    annotations:
+      summary: "High failed authentication attempts"
+      description: "Failed auth rate is {{ $value }}/s"
+
+  - alert: DDoSAttackDetected
+    expr: rate(http_requests_total[1m]) > 10000
+    for: 1m
+    labels:
+      severity: critical
+      component: security
+    annotations:
+      summary: "DDoS attack detected"
+      description: "Request rate is {{ $value }}/s"
+
+  - alert: SecurityPolicyViolation
+    expr: security_policy_violations_total > 0
+    for: 1m
+    labels:
+      severity: critical
+      component: security
+    annotations:
+      summary: "Security policy violation"
+      description: "Security policy violations: {{ $value }}"
+
+- name: business_metrics
+  interval: 30s
+  rules:
+  - alert: PredictionAccuracyLow
+    expr: prediction_accuracy < 0.85
+    for: 15m
+    labels:
+      severity: warning
+      component: business
+    annotations:
+      summary: "Prediction accuracy low"
+      description: "Prediction accuracy is {{ $value | humanizePercentage }}"
+
+  - alert: RealtimeLatencyHigh
+    expr: realtime_ingestion_latency_seconds > 0.001
+    for: 5m
+    labels:
+      severity: warning
+      component: business
+    annotations:
+      summary: "Realtime latency high"
+      description: "Ingestion latency is {{ $value }}s"
+
+  - alert: GPUBacklogHigh
+    expr: gpu_inference_queue_length > 1000
+    for: 5m
+    labels:
+      severity: warning
+      component: business
+    annotations:
+      summary: "GPU backlog high"
+      description: "GPU inference queue length is {{ $value }}"

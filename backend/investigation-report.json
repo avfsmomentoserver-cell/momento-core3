@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "test_type": "live_accuracy",
+    "n_rounds": 20,
+    "strategy": "dry_streak",
+    "timestamp": "2026-07-29T06:56:56.258424+00:00"
+  },
+  "investigation_result": {
+    "strategy_name": "dry_streak",
+    "bets_placed": 0,
+    "wins": 0,
+    "losses": 0,
+    "net_profit": 0.0,
+    "roi_pct": 0.0,
+    "win_rate": 0,
+    "final_balance": 100.0
+  },
+  "live_rounds": [
+    {
+      "round": 1,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 2,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 3,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 4,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 5,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 6,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 7,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 8,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 9,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 10,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 11,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 12,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 13,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 14,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 15,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 16,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 17,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 18,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 19,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    },
+    {
+      "round": 20,
+      "probability": 0.0,
+      "actual_multiplier": 1.0,
+      "result": {
+        "entered": false,
+        "reason": "DONT_ENTER: Probability 0.00% below threshold",
+        "balance": 100.0
+      }
+    }
+  ]
+}

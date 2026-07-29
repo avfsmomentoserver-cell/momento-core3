@@ -1,0 +1,51 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: momento-gateway
+  namespace: momento-v5
+  labels:
+    app: momento
+    version: v5
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "momento.local"
+    - "api.momento.local"
+    - "*.momento.local"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "momento.local"
+    - "api.momento.local"
+    - "*.momento.local"
+    tls:
+      mode: SIMPLE
+      credentialName: momento-tls-cert
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: momento-internal-gateway
+  namespace: momento-v5
+  labels:
+    app: momento
+    version: v5
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 8080
+      name: http-internal
+      protocol: HTTP
+    hosts:
+    - "*"

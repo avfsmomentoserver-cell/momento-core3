@@ -1,0 +1,26 @@
+# Helm Chart for Momento Core V5
+# V5 Specification: Helm charts for deployment
+
+apiVersion: v2
+name: momento-core
+description: Momento Core - Prediction and Analysis Platform for Crash-Style Games
+type: application
+version: 5.0.0
+appVersion: "5.0.0"
+
+keywords:
+  - momento
+  - prediction
+  - analysis
+  - crash-games
+  - real-time
+
+maintainers:
+  - name: Momento Core Team
+    email: team@momento.local
+
+home: https://github.com/momento-core/momento-core
+sources:
+  - https://github.com/momento-core/momento-core
+
+icon: https://momento.local/icon.png

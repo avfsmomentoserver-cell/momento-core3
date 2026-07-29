@@ -1,0 +1,111 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: momento-frontend
+  namespace: momento-v5
+  labels:
+    app: momento-frontend
+    version: v5
+spec:
+  hosts:
+  - "momento.local"
+  - "*.momento.local"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: momento-frontend-service
+        port:
+          number: 80
+      weight: 100
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: momento-backend
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+spec:
+  hosts:
+  - "api.momento.local"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: momento-backend-service
+        port:
+          number: 80
+      weight: 100
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 100ms
+  - match:
+    - uri:
+        prefix: /ws/
+    route:
+    - destination:
+        host: momento-backend-service
+        port:
+          number: 80
+      weight: 100
+    timeout: 86400s
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: momento-backend-internal
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - momento-internal-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /health
+    route:
+    - destination:
+        host: momento-backend-service
+        port:
+          number: 80
+  - match:
+    - uri:
+        prefix: /ready
+    route:
+    - destination:
+        host: momento-backend-service
+        port:
+          number: 80
+  - match:
+    - uri:
+        prefix: /metrics
+    route:
+    - destination:
+        host: momento-backend-service
+        port:
+          number: 9090

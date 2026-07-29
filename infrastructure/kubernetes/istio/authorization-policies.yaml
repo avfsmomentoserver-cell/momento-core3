@@ -1,0 +1,236 @@
+# Istio Authorization Policies for Momento Core V5
+# V5 Specification: mTLS and access control policies
+
+# Enable mTLS for all services in namespace
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default-mtls
+  namespace: momento-v5
+  labels:
+    version: v5
+spec:
+  mtls:
+    mode: STRICT
+
+# Backend authorization policy
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: momento-backend-authz
+  namespace: momento-v5
+  labels:
+    app: momento-backend
+    version: v5
+spec:
+  selector:
+    matchLabels:
+      app: momento-backend
+  action: ALLOW
+  rules:
+  # Allow health endpoint from Istio ingress
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+    to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /health
+        - /ready
+  # Allow API access from frontend
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/momento-v5/sa/momento-frontend
+    to:
+    - operation:
+        methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        paths:
+        - /api/*
+  # Allow metrics scraping from monitoring
+  - from:
+    - source:
+        namespaces:
+        - monitoring
+    to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /metrics
+  # Allow database access
+  - to:
+    - operation:
+        ports:
+        - "5432"
+  # Allow Redis access
+  - to:
+    - operation:
+        ports:
+        - "6379"
+
+# Frontend authorization policy
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: momento-frontend-authz
+  namespace: momento-v5
+  labels:
+    app: momento-frontend
+    version: v5
+spec:
+  selector:
+    matchLabels:
+      app: momento-frontend
+  action: ALLOW
+  rules:
+  # Allow public access from Istio ingress
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+    to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /*
+  # Allow backend API access
+  - to:
+    - operation:
+        ports:
+        - "8000"
+
+# PostgreSQL authorization policy
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: postgres-authz
+  namespace: momento-v5
+  labels:
+    app: postgres
+    version: v5
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  action: ALLOW
+  rules:
+  # Allow access from backend
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/momento-v5/sa/momento-backend
+    to:
+    - operation:
+        ports:
+        - "5432"
+  # Allow monitoring
+  - from:
+    - source:
+        namespaces:
+        - monitoring
+    to:
+    - operation:
+        ports:
+        - "9187"
+
+# Redis authorization policy
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: redis-authz
+  namespace: momento-v5
+  labels:
+    app: redis
+    version: v5
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  action: ALLOW
+  rules:
+  # Allow access from backend
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/momento-v5/sa/momento-backend
+    to:
+    - operation:
+        ports:
+        - "6379"
+  # Allow monitoring
+  - from:
+    - source:
+        namespaces:
+        - monitoring
+    to:
+    - operation:
+        ports:
+        - "9121"
+
+# Monitoring authorization policy
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: monitoring-authz
+  namespace: momento-v5
+  labels:
+    app: monitoring
+    version: v5
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  action: ALLOW
+  rules:
+  # Allow Grafana access
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/momento-v5/sa/grafana
+    to:
+    - operation:
+        ports:
+        - "9090"
+  # Allow Alertmanager access
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/momento-v5/sa/alertmanager
+    to:
+    - operation:
+        ports:
+        - "9090"
+  # Allow scraping from Prometheus
+  - to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - /metrics
+
+# Rate limiting policy for API
+apiVersion: networking.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-authentication
+  namespace: momento-v5
+  labels:
+    version: v5
+spec:
+  selector:
+    matchLabels:
+      app: momento-backend
+  jwtRules:
+  - issuer: "https://auth.momento.local"
+    jwksUri: "https://auth.momento.local/.well-known/jwks.json"
+    audiences:
+    - "momento-core"

@@ -1,0 +1,284 @@
+# Prometheus Alerting Rules for Momento Core V5
+# V5 Specification: Comprehensive alerting for system, application, and business metrics
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: momento-v5
+  labels:
+    app: prometheus
+    version: v5
+data:
+  system-alerts.yml: |
+    groups:
+    - name: system.alerts
+      interval: 30s
+      rules:
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: 100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 5 minutes on {{ $labels.instance }}"
+
+      # Critical CPU Usage
+      - alert: CriticalCPUUsage
+        expr: 100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) > 95
+        for: 2m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 95% for more than 2 minutes on {{ $labels.instance }}"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 80% for more than 5 minutes on {{ $labels.instance }}"
+
+      # Critical Memory Usage
+      - alert: CriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 95% for more than 2 minutes on {{ $labels.instance }}"
+
+      # Disk Space Low
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 20
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk space is below 20% on {{ $labels.instance }}"
+
+      # Disk Space Critical
+      - alert: DiskSpaceCritical
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 10
+        for: 2m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}"
+          description: "Disk space is below 10% on {{ $labels.instance }}"
+
+      # Node Down
+      - alert: NodeDown
+        expr: up{job="kubernetes-nodes"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Node {{ $labels.instance }} is down"
+          description: "Node {{ $labels.instance }} has been down for more than 2 minutes"
+
+  application-alerts.yml: |
+    groups:
+    - name: application.alerts
+      interval: 30s
+      rules:
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "High error rate on {{ $labels.app }}"
+          description: "Error rate is above 5% for more than 5 minutes on {{ $labels.app }}"
+
+      # Critical Error Rate
+      - alert: CriticalErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.10
+        for: 2m
+        labels:
+          severity: critical
+          category: application
+        annotations:
+          summary: "Critical error rate on {{ $labels.app }}"
+          description: "Error rate is above 10% for more than 2 minutes on {{ $labels.app }}"
+
+      # High Latency
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "High latency on {{ $labels.app }}"
+          description: "P95 latency is above 1 second for more than 5 minutes on {{ $labels.app }}"
+
+      # Critical Latency
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 5
+        for: 2m
+        labels:
+          severity: critical
+          category: application
+        annotations:
+          summary: "Critical latency on {{ $labels.app }}"
+          description: "P95 latency is above 5 seconds for more than 2 minutes on {{ $labels.app }}"
+
+      # Pod Crash Looping
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in the last 15 minutes"
+
+      # Pod Not Ready
+      - alert: PodNotReady
+        expr: kube_pod_status_ready{condition="true"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "Pod {{ $labels.pod }} is not ready"
+          description: "Pod {{ $labels.pod }} has been not ready for more than 5 minutes"
+
+      # Backend Down
+      - alert: BackendDown
+        expr: up{job="momento-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: application
+        annotations:
+          summary: "Backend service is down"
+          description: "Backend service has been down for more than 2 minutes"
+
+      # Frontend Down
+      - alert: FrontendDown
+        expr: up{job="momento-frontend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: application
+        annotations:
+          summary: "Frontend service is down"
+          description: "Frontend service has been down for more than 2 minutes"
+
+  database-alerts.yml: |
+    groups:
+    - name: database.alerts
+      interval: 30s
+      rules:
+      # PostgreSQL Connection Pool Exhausted
+      - alert: PostgresConnectionPoolExhausted
+        expr: pg_stat_activity_count / pg_settings_max_connections > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "PostgreSQL connection pool nearly exhausted"
+          description: "PostgreSQL connection pool is above 90% capacity"
+
+      # PostgreSQL High Query Duration
+      - alert: PostgresHighQueryDuration
+        expr: pg_stat_statements_mean_exec_time > 1000
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "PostgreSQL high query duration"
+          description: "Average query duration is above 1 second"
+
+      # PostgreSQL Replication Lag
+      - alert: PostgresReplicationLag
+        expr: pg_replication_lag_seconds > 30
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "PostgreSQL replication lag"
+          description: "PostgreSQL replication lag is above 30 seconds"
+
+      # Redis High Memory Usage
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Redis high memory usage"
+          description: "Redis memory usage is above 90%"
+
+      # Redis Connection Pool Exhausted
+      - alert: RedisConnectionPoolExhausted
+        expr: redis_connected_clients / redis_config_maxclients > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Redis connection pool nearly exhausted"
+          description: "Redis connection pool is above 90% capacity"
+
+  business-alerts.yml: |
+    groups:
+    - name: business.alerts
+      interval: 30s
+      rules:
+      # Low Request Rate
+      - alert: LowRequestRate
+        expr: rate(http_requests_total[5m]) < 10
+        for: 10m
+        labels:
+          severity: info
+          category: business
+        annotations:
+          summary: "Low request rate"
+          description: "Request rate is below 10 requests/second for more than 10 minutes"
+
+      # Prediction Accuracy Drop
+      - alert: PredictionAccuracyDrop
+        expr: prediction_accuracy < 0.7
+        for: 10m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Prediction accuracy drop"
+          description: "Prediction accuracy has dropped below 70%"
+
+      # High Data Ingestion Lag
+      - alert: HighDataIngestionLag
+        expr: data_ingestion_lag_seconds > 60
+        for: 5m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "High data ingestion lag"
+          description: "Data ingestion lag is above 60 seconds"

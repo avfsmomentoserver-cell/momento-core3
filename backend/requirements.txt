@@ -1,0 +1,48 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+python-multipart==0.0.20
+
+# V5 Security Hardening Dependencies
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+PyJWT==2.9.0
+cryptography==44.0.0
+pyopenssl==24.3.0
+authlib==1.3.1
+python-multipart==0.0.20
+aiohttp==3.11.11
+slowapi==0.1.9
+ipaddress==1.0.23
+pyotp==2.9.0
+qrcode==8.0
+pillow==11.1.0
+
+# V5 Commercial Features
+stripe==11.3.0
+
+# V5 GPU Intelligence Dependencies
+# PyTorch with CUDA support (install with correct CUDA version)
+# Note: Install with: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# TensorRT for model optimization (requires CUDA 12.2+)
+# Note: Install from NVIDIA wheels: https://developer.nvidia.com/tensorrt
+tensorrt>=8.6.0
+
+# CuPy for GPU-accelerated NumPy operations
+cupy-cuda12x>=13.0.0
+
+# Optional: torch2trt for PyTorch to TensorRT conversion
+# torch2trt>=0.4.0
+
+# NumPy and SciPy for CPU fallback and numerical operations
+numpy>=1.24.0
+scipy>=1.11.0
+
+# V5 Free-Tier CPU Dependencies
+psutil>=5.9.6
+onnxruntime>=1.16.0
+scikit-learn>=1.3.0

@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "suite": "momento-dynamic-strategies",
+    "purpose": "Dynamic adaptive strategy testing",
+    "data_points": 2000
+  },
+  "results": [
+    {
+      "config": "Dynamic_Aggressive",
+      "strategy": "Volatility Adaptive",
+      "bets_placed": 49,
+      "wins": 25,
+      "losses": 24,
+      "win_rate": 51.02040816326531,
+      "net_profit": 9.34412538180932,
+      "roi_pct": 9.34412538180932,
+      "max_drawdown": 8.545612623615009,
+      "final_balance": 109.34412538180932,
+      "max_consecutive_losses": 4,
+      "error": null
+    },
+    {
+      "config": "Dynamic_Aggressive",
+      "strategy": "Momentum Reversal",
+      "bets_placed": 85,
+      "wins": 44,
+      "losses": 41,
+      "win_rate": 51.76470588235295,
+      "net_profit": 15.804074004996224,
+      "roi_pct": 15.804074004996224,
+      "max_drawdown": 13.647252172073305,
+      "final_balance": 115.80407400499622,
+      "max_consecutive_losses": 4,
+      "error": null
+    },
+    {
+      "config": "Dynamic_Aggressive",
+      "strategy": "Dynamic Confidence",
+      "bets_placed": 93,
+      "wins": 50,
+      "losses": 43,
+      "win_rate": 53.76344086021505,
+      "net_profit": 17.6473114892203,
+      "roi_pct": 17.6473114892203,
+      "max_drawdown": 15.00018255056961,
+      "final_balance": 117.6473114892203,
+      "max_consecutive_losses": 4,
+      "error": null
+    },
+    {
+      "config": "Dynamic_Balanced",
+      "strategy": "Volatility Adaptive",
+      "bets_placed": 11,
+      "wins": 5,
+      "losses": 6,
+      "win_rate": 45.45454545454545,
+      "net_profit": 2.1459071381507755,
+      "roi_pct": 2.1459071381507755,
+      "max_drawdown": 2.1008253764377156,
+      "final_balance": 102.14590713815078,
+      "max_consecutive_losses": 3,
+      "error": null
+    },
+    {
+      "config": "Dynamic_Balanced",
+      "strategy": "Momentum Reversal",
+      "bets_placed": 11,
+      "wins": 5,
+      "losses": 6,
+      "win_rate": 45.45454545454545,
+      "net_profit": 2.1459071381507755,
+      "roi_pct": 2.1459071381507755,
+      "max_drawdown": 2.1008253764377156,
+      "final_balance": 102.14590713815078,
+      "max_consecutive_losses": 3,
+      "error": null
+    },
+    {
+      "config": "Dynamic_Balanced",
+      "strategy": "Dynamic Confidence",
+      "bets_placed": 11,
+      "wins": 5,
+      "losses": 6,
+      "win_rate": 45.45454545454545,
+      "net_profit": 2.1459071381507755,
+      "roi_pct": 2.1459071381507755,
+      "max_drawdown": 2.1008253764377156,
+      "final_balance": 102.14590713815078,
+      "max_consecutive_losses": 3,
+      "error": null
+    }
+  ]
+}

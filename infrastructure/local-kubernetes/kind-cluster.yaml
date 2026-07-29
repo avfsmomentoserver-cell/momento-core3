@@ -1,0 +1,37 @@
+# V5 Free-Tier Kubernetes Cluster using Kind (Kubernetes in Docker)
+# Local Kubernetes deployment for zero-cost development
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: momento-v5-free-tier
+nodes:
+- role: control-plane
+  image: kindest/node:v1.28.0
+  extraPortMappings:
+  - containerPort: 30000
+    hostPort: 8080
+    protocol: TCP
+  - containerPort: 30001
+    hostPort: 8443
+    protocol: TCP
+  extraMounts:
+  - hostPath: ./data/postgres
+    containerPath: /var/lib/postgresql/data
+    propagation: HostToContainer
+  - hostPath: ./data/redis
+    containerPath: /data
+    propagation: HostToContainer
+
+- role: worker
+  image: kindest/node:v1.28.0
+  extraMounts:
+  - hostPath: ./data/postgres-worker
+    containerPath: /var/lib/postgresql/data
+    propagation: HostToContainer
+
+- role: worker
+  image: kindest/node:v1.28.0
+  extraMounts:
+  - hostPath: ./data/redis-worker
+    containerPath: /data
+    propagation: HostToContainer

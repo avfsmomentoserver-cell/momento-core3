@@ -1,0 +1,95 @@
+# Backend Deployment Template for Momento Core V5
+
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "momento-core.fullname" . }}-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "momento-core.labels" . | nindent 4 }}
+    app: momento-backend
+    version: v5
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: momento-backend
+  template:
+    metadata:
+      labels:
+        app: momento-backend
+        version: v5
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "momento-core.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.security.podSecurityContext | nindent 8 }}
+      containers:
+      - name: backend
+        image: {{ include "momento-core.backend.image" . }}
+        imagePullPolicy: {{ .Values.image.backend.pullPolicy }}
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        - name: APP_ENV
+          value: {{ .Values.backend.env.APP_ENV | quote }}
+        - name: LOG_LEVEL
+          value: {{ .Values.backend.env.LOG_LEVEL | quote }}
+        - name: POSTGRES_HOST
+          value: {{ include "momento-core.fullname" . }}-postgres
+        - name: POSTGRES_PORT
+          value: {{ .Values.postgres.service.port | quote }}
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "momento-core.fullname" . }}-postgres
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "momento-core.fullname" . }}-postgres
+              key: password
+        - name: REDIS_HOST
+          value: {{ include "momento-core.fullname" . }}-redis
+        - name: REDIS_PORT
+          value: {{ .Values.redis.service.port | quote }}
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "momento-core.fullname" . }}-redis
+              key: password
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          {{- toYaml .Values.security.containerSecurityContext | nindent 10 }}
+{{- end }}

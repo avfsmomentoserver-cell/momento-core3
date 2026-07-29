@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "test_type": "live_accuracy",
+    "n_rounds": 20,
+    "strategy": "base_rate",
+    "timestamp": "2026-07-29T06:58:09.438542+00:00"
+  },
+  "investigation_result": {
+    "strategy_name": "base_rate",
+    "bets_placed": 5,
+    "wins": 1,
+    "losses": 4,
+    "net_profit": 1.6263150474239723,
+    "roi_pct": 1.626315047423972,
+    "win_rate": 20.0,
+    "final_balance": 101.62631504742397
+  },
+  "live_rounds": [
+    {
+      "round": 1,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.9072875137777852,
+      "result": {
+        "entered": true,
+        "bet_size": 0.5,
+        "probability": 0.3326530612244898,
+        "actual_multiplier": 1.9072875137777852,
+        "target_multiplier": 2.0,
+        "outcome": "LOSS",
+        "payout": 0.9536437568888926,
+        "balance": 100.4536437568889,
+        "entry_reason": "ENTER: Probability 33.27% >= threshold 5.00%",
+        "exit_reason": "HOLD: Current 1.91x, target 2.00x"
+      }
+    },
+    {
+      "round": 2,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 2.486280243046343,
+      "result": {
+        "entered": true,
+        "bet_size": 0.5,
+        "probability": 0.3326530612244898,
+        "actual_multiplier": 2.486280243046343,
+        "target_multiplier": 2.0,
+        "outcome": "WIN",
+        "payout": 1.0,
+        "balance": 100.9536437568889,
+        "entry_reason": "ENTER: Probability 33.27% >= threshold 5.00%",
+        "exit_reason": "EXIT: Target reached at 2.49x"
+      }
+    },
+    {
+      "round": 3,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.8382535068294457,
+      "result": {
+        "entered": true,
+        "bet_size": 0.5,
+        "probability": 0.3326530612244898,
+        "actual_multiplier": 1.8382535068294457,
+        "target_multiplier": 2.0,
+        "outcome": "LOSS",
+        "payout": 0.9191267534147228,
+        "balance": 101.37277051030361,
+        "entry_reason": "ENTER: Probability 33.27% >= threshold 5.00%",
+        "exit_reason": "HOLD: Current 1.84x, target 2.00x"
+      }
+    },
+    {
+      "round": 4,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.30904580481967,
+      "result": {
+        "entered": true,
+        "bet_size": 0.5,
+        "probability": 0.3326530612244898,
+        "actual_multiplier": 1.30904580481967,
+        "target_multiplier": 2.0,
+        "outcome": "LOSS",
+        "payout": 0.654522902409835,
+        "balance": 101.52729341271345,
+        "entry_reason": "ENTER: Probability 33.27% >= threshold 5.00%",
+        "exit_reason": "HOLD: Current 1.31x, target 2.00x"
+      }
+    },
+    {
+      "round": 5,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.198043269421057,
+      "result": {
+        "entered": true,
+        "bet_size": 0.5,
+        "probability": 0.3326530612244898,
+        "actual_multiplier": 1.198043269421057,
+        "target_multiplier": 2.0,
+        "outcome": "LOSS",
+        "payout": 0.5990216347105285,
+        "balance": 101.62631504742397,
+        "entry_reason": "ENTER: Probability 33.27% >= threshold 5.00%",
+        "exit_reason": "HOLD: Current 1.20x, target 2.00x"
+      }
+    },
+    {
+      "round": 6,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.816231771395401,
+      "result": null
+    },
+    {
+      "round": 7,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.0654325737100938,
+      "result": null
+    },
+    {
+      "round": 8,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.8867661721214033,
+      "result": null
+    },
+    {
+      "round": 9,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 2.7109003866119092,
+      "result": null
+    },
+    {
+      "round": 10,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 2.371360530962571,
+      "result": null
+    },
+    {
+      "round": 11,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 2.9556850589040935,
+      "result": null
+    },
+    {
+      "round": 12,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.7962792854887462,
+      "result": null
+    },
+    {
+      "round": 13,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.2443194381745275,
+      "result": null
+    },
+    {
+      "round": 14,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.9094347371410343,
+      "result": null
+    },
+    {
+      "round": 15,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 2.2834089344664354,
+      "result": null
+    },
+    {
+      "round": 16,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.0427149094727413,
+      "result": null
+    },
+    {
+      "round": 17,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.4871377943280473,
+      "result": null
+    },
+    {
+      "round": 18,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 2.1291559518159264,
+      "result": null
+    },
+    {
+      "round": 19,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 2.530314751777169,
+      "result": null
+    },
+    {
+      "round": 20,
+      "probability": 0.3326530612244898,
+      "actual_multiplier": 1.4319027038373495,
+      "result": null
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+# Grafana Datasources Configuration for Momento Core V5
+# V5 Specification: Prometheus, Loki, Tempo datasources
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: momento-v5
+  labels:
+    app: grafana
+    version: v5
+data:
+  datasources.yml: |
+    apiVersion: 1
+
+    datasources:
+    # Prometheus Datasource
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus:9090
+      isDefault: true
+      editable: true
+      jsonData:
+        timeInterval: 15s
+        queryTimeout: 60s
+        httpMethod: POST
+      version: 1
+
+    # Loki Datasource for Logs
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki:3100
+      editable: true
+      jsonData:
+        maxLines: 1000
+        derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: "trace_id=(\\w+)"
+          name: TraceID
+          url: "$${__value.raw}"
+          urlDisplayLabel: "View Trace"
+
+    # Tempo Datasource for Traces
+    - name: Tempo
+      type: tempo
+      access: proxy
+      url: http://tempo:3200
+      editable: true
+      jsonData:
+        search:
+          hideSearch: false
+        traceToLogs:
+          datasourceUid: loki
+          filterByTraceID: true
+          filterBySpanID: false
+          customQuery: true
+          query: '{service_name="backend", trace_id="$${__trace.traceId}"}'
+        spanMetrics:
+          datasourceUid: prometheus
+          enabled: true
+          errorBuildDatasource: false
+          histograms: true

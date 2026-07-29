@@ -1,0 +1,2112 @@
+{
+  "meta": {
+    "suite": "momento-research",
+    "purpose": "Falsification harness. A null result is the expected and correct outcome and must not be tuned away.",
+    "target": "moonshot >= 20.0x within the next 10 rounds"
+  },
+  "load": {
+    "sources": [
+      "../test_research.csv"
+    ],
+    "rows_read": 1000,
+    "rows_out": 1000,
+    "duplicate_ids": 0,
+    "id_order_equals_time_order": false,
+    "span": [
+      "2026-07-28T00:47:00+00:00",
+      "2026-07-29T12:40:00+00:00"
+    ],
+    "band_counts": {
+      "low": 619,
+      "floor": 372,
+      "base": 3,
+      "mid": 2,
+      "ignition": 2,
+      "moonshot": 2
+    },
+    "checksum_columns_present": []
+  },
+  "target_summary": {
+    "horizon": 10,
+    "threshold": 20.0,
+    "scorable_decision_points": 990,
+    "excluded_incomplete_horizon": 10,
+    "base_rate": 0.01818181818181818
+  },
+  "strategies": [
+    {
+      "strategy": "base_rate",
+      "description": "Predicts the training-set frequency of a moonshot within the horizon, ignoring all history. The reference baseline.",
+      "horizon": 10,
+      "threshold": 20.0,
+      "n_folds": 5,
+      "pooled": {
+        "n": 490,
+        "base_rate": 0.0,
+        "brier": 0.0007837306309445897,
+        "reference_brier": 0.0007269688653965255,
+        "skill_score": -0.0780800502606167,
+        "skill_ci": {
+          "point": -0.0780800502606167,
+          "ci": [
+            null,
+            null
+          ],
+          "n_boot": 0
+        },
+        "log_loss": 0.027790516918188048,
+        "calibration": [
+          {
+            "bin": 0,
+            "range": [
+              0.0,
+              0.1
+            ],
+            "count": 490,
+            "mean_predicted": 0.02739067055393613,
+            "observed_rate": 0.0
+          },
+          {
+            "bin": 1,
+            "range": [
+              0.1,
+              0.2
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 2,
+            "range": [
+              0.2,
+              0.3
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 3,
+            "range": [
+              0.3,
+              0.4
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 4,
+            "range": [
+              0.4,
+              0.5
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 5,
+            "range": [
+              0.5,
+              0.6
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 6,
+            "range": [
+              0.6,
+              0.7
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 7,
+            "range": [
+              0.7,
+              0.8
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 8,
+            "range": [
+              0.8,
+              0.9
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 9,
+            "range": [
+              0.9,
+              1.0
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          }
+        ],
+        "hits": {
+          "decision_threshold": 0.5,
+          "true_positive": 0,
+          "false_positive": 0,
+          "true_negative": 490,
+          "false_negative": 0,
+          "signals_fired": 0,
+          "precision": null,
+          "recall": null,
+          "accuracy": 1.0
+        }
+      },
+      "reference_rate_from_training": 0.02696236015998081,
+      "per_fold": [
+        {
+          "index": 0,
+          "train": [
+            0,
+            500
+          ],
+          "test": [
+            500,
+            598
+          ],
+          "train_size": 500,
+          "test_size": 98,
+          "train_base_rate": 0.036,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 0.0013494377342773848,
+            "reference_brier": 0.001296000000000002,
+            "skill_score": -0.04123281965847436,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.03742640551911691,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.036734693877551024,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          }
+        },
+        {
+          "index": 1,
+          "train": [
+            0,
+            598
+          ],
+          "test": [
+            598,
+            696
+          ],
+          "train_size": 598,
+          "test_size": 98,
+          "train_base_rate": 0.030100334448160536,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 0.0009371095376926284,
+            "reference_brier": 0.0009060301338911214,
+            "skill_score": -0.03430283678096924,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.0310905870700311,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.03061224489795921,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          }
+        },
+        {
+          "index": 2,
+          "train": [
+            0,
+            696
+          ],
+          "test": [
+            696,
+            794
+          ],
+          "train_size": 696,
+          "test_size": 98,
+          "train_base_rate": 0.02586206896551724,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 0.0006884886399374421,
+            "reference_brier": 0.0006688466111771706,
+            "skill_score": -0.029367015444246025,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.026589454189239522,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.026239067055393587,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          }
+        },
+        {
+          "index": 3,
+          "train": [
+            0,
+            794
+          ],
+          "test": [
+            794,
+            892
+          ],
+          "train_size": 794,
+          "test_size": 98,
+          "train_base_rate": 0.022670025188916875,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 0.0005271241149521023,
+            "reference_brier": 0.0005139300420661247,
+            "skill_score": -0.025672896709704407,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.023226850609816548,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.022959183673469448,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          }
+        },
+        {
+          "index": 4,
+          "train": [
+            0,
+            892
+          ],
+          "test": [
+            892,
+            990
+          ],
+          "train_size": 892,
+          "test_size": 98,
+          "train_base_rate": 0.020179372197309416,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 0.0004164931278633904,
+            "reference_brier": 0.000407207062277544,
+            "skill_score": -0.022804284223138627,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.020619287202735745,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.02040816326530614,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          }
+        }
+      ],
+      "paper_pnl": [
+        {
+          "cashout": 2.0,
+          "stake": 1.0,
+          "bets": 0,
+          "wins": 0,
+          "losses": 0,
+          "net": 0.0,
+          "ev_per_unit_staked": null,
+          "max_drawdown": 0.0
+        },
+        {
+          "cashout": 5.0,
+          "stake": 1.0,
+          "bets": 0,
+          "wins": 0,
+          "losses": 0,
+          "net": 0.0,
+          "ev_per_unit_staked": null,
+          "max_drawdown": 0.0
+        },
+        {
+          "cashout": 20.0,
+          "stake": 1.0,
+          "bets": 0,
+          "wins": 0,
+          "losses": 0,
+          "net": 0.0,
+          "ev_per_unit_staked": null,
+          "max_drawdown": 0.0
+        }
+      ],
+      "pnl_note": "EV per unit staked is c-1 at every cashout target for a fair crash game, so a flat pnl column is the expected result.",
+      "permutation_test": {
+        "observed": -0.0780800502606167,
+        "n_permutations": 50,
+        "null_mean": -0.029629332952764088,
+        "null_p95": 0.0009526011991835338,
+        "percentile_vs_null": 28.0,
+        "p_value_one_sided": 0.7254901960784313,
+        "significant_at_0.05": false,
+        "interpretation": "Observed skill is inside the shuffled null: no structure beyond what shuffling reproduces. This is a pass."
+      }
+    },
+    {
+      "strategy": "dry_streak",
+      "description": "Conditions the moonshot-within-horizon probability on the current run of consecutive sub-2x rounds (the 'dry phase').",
+      "horizon": 10,
+      "threshold": 20.0,
+      "n_folds": 5,
+      "pooled": {
+        "n": 490,
+        "base_rate": 0.0,
+        "brier": 4.4421031449025906e-05,
+        "reference_brier": 0.0007269688653965255,
+        "skill_score": 0.9388955517031717,
+        "skill_ci": {
+          "point": 0.9388955517031717,
+          "ci": [
+            null,
+            null
+          ],
+          "n_boot": 0
+        },
+        "log_loss": 0.006523726664826994,
+        "calibration": [
+          {
+            "bin": 0,
+            "range": [
+              0.0,
+              0.1
+            ],
+            "count": 490,
+            "mean_predicted": 0.00650140946730551,
+            "observed_rate": 0.0
+          },
+          {
+            "bin": 1,
+            "range": [
+              0.1,
+              0.2
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 2,
+            "range": [
+              0.2,
+              0.3
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 3,
+            "range": [
+              0.3,
+              0.4
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 4,
+            "range": [
+              0.4,
+              0.5
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 5,
+            "range": [
+              0.5,
+              0.6
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 6,
+            "range": [
+              0.6,
+              0.7
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 7,
+            "range": [
+              0.7,
+              0.8
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 8,
+            "range": [
+              0.8,
+              0.9
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          },
+          {
+            "bin": 9,
+            "range": [
+              0.9,
+              1.0
+            ],
+            "count": 0,
+            "mean_predicted": null,
+            "observed_rate": null
+          }
+        ],
+        "hits": {
+          "decision_threshold": 0.5,
+          "true_positive": 0,
+          "false_positive": 0,
+          "true_negative": 490,
+          "false_negative": 0,
+          "signals_fired": 0,
+          "precision": null,
+          "recall": null,
+          "accuracy": 1.0
+        }
+      },
+      "reference_rate_from_training": 0.02696236015998081,
+      "per_fold": [
+        {
+          "index": 0,
+          "train": [
+            0,
+            500
+          ],
+          "test": [
+            500,
+            598
+          ],
+          "train_size": 500,
+          "test_size": 98,
+          "train_base_rate": 0.036,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 7.901234567901221e-05,
+            "reference_brier": 0.001296000000000002,
+            "skill_score": 0.9390336838896511,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.008928630744301305,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.008888888888888866,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          },
+          "learned_table": {
+            "base_rate": 0.036734693877551024,
+            "low_threshold": 2.0,
+            "buckets": [
+              {
+                "bucket": 0,
+                "streak_range": [
+                  0,
+                  0
+                ],
+                "support": 9,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 1,
+                "streak_range": [
+                  1,
+                  2
+                ],
+                "support": 16,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 2,
+                "streak_range": [
+                  3,
+                  4
+                ],
+                "support": 5,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 3,
+                "streak_range": [
+                  5,
+                  9
+                ],
+                "support": 10,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 4,
+                "streak_range": [
+                  10,
+                  null
+                ],
+                "support": 450,
+                "p_target": 0.008888888888888889,
+                "fell_back_to_base_rate": false
+              }
+            ]
+          }
+        },
+        {
+          "index": 1,
+          "train": [
+            0,
+            598
+          ],
+          "test": [
+            598,
+            696
+          ],
+          "train_size": 598,
+          "test_size": 98,
+          "train_base_rate": 0.030100334448160536,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 5.32793435984869e-05,
+            "reference_brier": 0.0009060301338911214,
+            "skill_score": 0.9411947333697739,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.007326040092072906,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.007299270072992694,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          },
+          "learned_table": {
+            "base_rate": 0.030612244897959183,
+            "low_threshold": 2.0,
+            "buckets": [
+              {
+                "bucket": 0,
+                "streak_range": [
+                  0,
+                  0
+                ],
+                "support": 9,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 1,
+                "streak_range": [
+                  1,
+                  2
+                ],
+                "support": 16,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 2,
+                "streak_range": [
+                  3,
+                  4
+                ],
+                "support": 5,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 3,
+                "streak_range": [
+                  5,
+                  9
+                ],
+                "support": 10,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 4,
+                "streak_range": [
+                  10,
+                  null
+                ],
+                "support": 548,
+                "p_target": 0.0072992700729927005,
+                "fell_back_to_base_rate": false
+              }
+            ]
+          }
+        },
+        {
+          "index": 2,
+          "train": [
+            0,
+            696
+          ],
+          "test": [
+            696,
+            794
+          ],
+          "train_size": 696,
+          "test_size": 98,
+          "train_base_rate": 0.02586206896551724,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 3.834025055353743e-05,
+            "reference_brier": 0.0006688466111771706,
+            "skill_score": 0.9426770653946223,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.006211200092640643,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.006191950464396283,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          },
+          "learned_table": {
+            "base_rate": 0.026239067055393587,
+            "low_threshold": 2.0,
+            "buckets": [
+              {
+                "bucket": 0,
+                "streak_range": [
+                  0,
+                  0
+                ],
+                "support": 9,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 1,
+                "streak_range": [
+                  1,
+                  2
+                ],
+                "support": 16,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 2,
+                "streak_range": [
+                  3,
+                  4
+                ],
+                "support": 5,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 3,
+                "streak_range": [
+                  5,
+                  9
+                ],
+                "support": 10,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 4,
+                "streak_range": [
+                  10,
+                  null
+                ],
+                "support": 646,
+                "p_target": 0.006191950464396285,
+                "fell_back_to_base_rate": false
+              }
+            ]
+          }
+        },
+        {
+          "index": 3,
+          "train": [
+            0,
+            794
+          ],
+          "test": [
+            794,
+            892
+          ],
+          "train_size": 794,
+          "test_size": 98,
+          "train_base_rate": 0.022670025188916875,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 2.890507573129845e-05,
+            "reference_brier": 0.0005139300420661247,
+            "skill_score": 0.9437567891242689,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.005390848634876427,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.0053763440860215015,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          },
+          "learned_table": {
+            "base_rate": 0.02295918367346939,
+            "low_threshold": 2.0,
+            "buckets": [
+              {
+                "bucket": 0,
+                "streak_range": [
+                  0,
+                  0
+                ],
+                "support": 9,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 1,
+                "streak_range": [
+                  1,
+                  2
+                ],
+                "support": 16,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 2,
+                "streak_range": [
+                  3,
+                  4
+                ],
+                "support": 5,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 3,
+                "streak_range": [
+                  5,
+                  9
+                ],
+                "support": 10,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 4,
+                "streak_range": [
+                  10,
+                  null
+                ],
+                "support": 744,
+                "p_target": 0.005376344086021506,
+                "fell_back_to_base_rate": false
+              }
+            ]
+          }
+        },
+        {
+          "index": 4,
+          "train": [
+            0,
+            892
+          ],
+          "test": [
+            892,
+            990
+          ],
+          "train_size": 892,
+          "test_size": 98,
+          "train_base_rate": 0.020179372197309416,
+          "score": {
+            "n": 98,
+            "base_rate": 0.0,
+            "brier": 2.25681416827935e-05,
+            "reference_brier": 0.000407207062277544,
+            "skill_score": 0.9445782164077215,
+            "skill_ci": {
+              "point": NaN,
+              "ci": [
+                null,
+                null
+              ],
+              "n_boot": 0
+            },
+            "log_loss": 0.004761913760243707,
+            "calibration": [
+              {
+                "bin": 0,
+                "range": [
+                  0.0,
+                  0.1
+                ],
+                "count": 98,
+                "mean_predicted": 0.004750593824228033,
+                "observed_rate": 0.0
+              },
+              {
+                "bin": 1,
+                "range": [
+                  0.1,
+                  0.2
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 2,
+                "range": [
+                  0.2,
+                  0.3
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 3,
+                "range": [
+                  0.3,
+                  0.4
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 4,
+                "range": [
+                  0.4,
+                  0.5
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 5,
+                "range": [
+                  0.5,
+                  0.6
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 6,
+                "range": [
+                  0.6,
+                  0.7
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 7,
+                "range": [
+                  0.7,
+                  0.8
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 8,
+                "range": [
+                  0.8,
+                  0.9
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              },
+              {
+                "bin": 9,
+                "range": [
+                  0.9,
+                  1.0
+                ],
+                "count": 0,
+                "mean_predicted": null,
+                "observed_rate": null
+              }
+            ],
+            "hits": {
+              "decision_threshold": 0.5,
+              "true_positive": 0,
+              "false_positive": 0,
+              "true_negative": 98,
+              "false_negative": 0,
+              "signals_fired": 0,
+              "precision": null,
+              "recall": null,
+              "accuracy": 1.0
+            }
+          },
+          "learned_table": {
+            "base_rate": 0.02040816326530612,
+            "low_threshold": 2.0,
+            "buckets": [
+              {
+                "bucket": 0,
+                "streak_range": [
+                  0,
+                  0
+                ],
+                "support": 9,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 1,
+                "streak_range": [
+                  1,
+                  2
+                ],
+                "support": 16,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 2,
+                "streak_range": [
+                  3,
+                  4
+                ],
+                "support": 5,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 3,
+                "streak_range": [
+                  5,
+                  9
+                ],
+                "support": 10,
+                "p_target": null,
+                "fell_back_to_base_rate": true
+              },
+              {
+                "bucket": 4,
+                "streak_range": [
+                  10,
+                  null
+                ],
+                "support": 842,
+                "p_target": 0.004750593824228029,
+                "fell_back_to_base_rate": false
+              }
+            ]
+          }
+        }
+      ],
+      "paper_pnl": [
+        {
+          "cashout": 2.0,
+          "stake": 1.0,
+          "bets": 0,
+          "wins": 0,
+          "losses": 0,
+          "net": 0.0,
+          "ev_per_unit_staked": null,
+          "max_drawdown": 0.0
+        },
+        {
+          "cashout": 5.0,
+          "stake": 1.0,
+          "bets": 0,
+          "wins": 0,
+          "losses": 0,
+          "net": 0.0,
+          "ev_per_unit_staked": null,
+          "max_drawdown": 0.0
+        },
+        {
+          "cashout": 20.0,
+          "stake": 1.0,
+          "bets": 0,
+          "wins": 0,
+          "losses": 0,
+          "net": 0.0,
+          "ev_per_unit_staked": null,
+          "max_drawdown": 0.0
+        }
+      ],
+      "pnl_note": "EV per unit staked is c-1 at every cashout target for a fair crash game, so a flat pnl column is the expected result.",
+      "permutation_test": {
+        "observed": 0.9388955517031717,
+        "n_permutations": 50,
+        "null_mean": -0.05347999800970734,
+        "null_p95": 0.19666800065698042,
+        "percentile_vs_null": 100.0,
+        "p_value_one_sided": 0.0196078431372549,
+        "significant_at_0.05": true,
+        "interpretation": "Observed skill clears the shuffled null; investigate before believing it."
+      }
+    }
+  ]
+}

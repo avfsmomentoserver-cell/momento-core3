@@ -1,0 +1,176 @@
+# V5 Free-Tier Istio Configuration
+# Local service mesh configuration for development
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: momento-gateway
+  namespace: momento-production
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: momento-tls-secret
+    hosts:
+    - "momento.local"
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: momento-backend
+  namespace: momento-production
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1"
+    route:
+    - destination:
+        host: momento-backend
+        port:
+          number: 8000
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,connect-failure,refused-stream
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: momento-backend
+  namespace: momento-production
+spec:
+  host: momento-backend
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        http1MaxPendingRequests: 25
+        maxRequestsPerConnection: 3
+    circuitBreaker:
+      consecutiveErrors: 3
+      interval: 15s
+      baseEjectionTime: 15s
+      maxEjectionPercent: 30
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: momento-frontend
+  namespace: momento-production
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - momento-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: momento-frontend
+        port:
+          number: 3000
+
+---
+# Service entry for external databases
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-postgres
+  namespace: momento-production
+spec:
+  hosts:
+  - postgres.local
+  location: MESH_EXTERNAL
+  ports:
+  - number: 5432
+    name: postgres
+    protocol: TCP
+  resolution: DNS
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-redis
+  namespace: momento-production
+spec:
+  hosts:
+  - redis.local
+  location: MESH_EXTERNAL
+  ports:
+  - number: 6379
+    name: redis
+    protocol: TCP
+  resolution: DNS
+
+---
+# Security policies for local development
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: momento-default
+  namespace: momento-production
+spec:
+  mtls:
+    mode: PERMISSIVE  # Permissive for local development
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: momento-jwt
+  namespace: momento-production
+spec:
+  selector:
+    matchLabels:
+      app: momento-backend
+  jwtRules:
+  - issuer: "http://momento.local/auth"
+    jwksUri: "http://momento.local/auth/.well-known/jwks.json"
+    forwardOriginalToken: true
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: momento-authz
+  namespace: momento-production
+spec:
+  selector:
+    matchLabels:
+      app: momento-backend
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE

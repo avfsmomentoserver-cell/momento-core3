@@ -1,0 +1,151 @@
+# Tempo Deployment for Momento Core V5
+# V5 Specification: Tempo 2.3+, 7-day retention, 1% sampling
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo
+  namespace: momento-v5
+  labels:
+    app: tempo
+    version: v5
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tempo
+  template:
+    metadata:
+      labels:
+        app: tempo
+        version: v5
+    spec:
+      serviceAccountName: tempo
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      containers:
+      - name: tempo
+        image: grafana/tempo:2.3.4
+        imagePullPolicy: IfNotPresent
+        args:
+          - '-config.file=/etc/tempo/tempo-config.yaml'
+        ports:
+        - containerPort: 3200
+          name: http
+          protocol: TCP
+        - containerPort: 4317
+          name: otlp-grpc
+          protocol: TCP
+        - containerPort: 4318
+          name: otlp-http
+          protocol: TCP
+        - containerPort: 14250
+          name: jaeger-grpc
+          protocol: TCP
+        - containerPort: 14268
+          name: jaeger-http
+          protocol: TCP
+        - containerPort: 9411
+          name: zipkin
+          protocol: TCP
+        env:
+        - name: TZ
+          value: UTC
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /ready
+            port: 3200
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3200
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: config
+          mountPath: /etc/tempo
+          readOnly: true
+        - name: storage
+          mountPath: /var/tempo
+      volumes:
+      - name: config
+        configMap:
+          name: tempo-config
+      - name: storage
+        persistentVolumeClaim:
+          claimName: tempo-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo
+  namespace: momento-v5
+  labels:
+    app: tempo
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3200
+    targetPort: 3200
+    protocol: TCP
+    name: http
+  - port: 4317
+    targetPort: 4317
+    protocol: TCP
+    name: otlp-grpc
+  - port: 4318
+    targetPort: 4318
+    protocol: TCP
+    name: otlp-http
+  - port: 14250
+    targetPort: 14250
+    protocol: TCP
+    name: jaeger-grpc
+  - port: 14268
+    targetPort: 14268
+    protocol: TCP
+    name: jaeger-http
+  - port: 9411
+    targetPort: 9411
+    protocol: TCP
+    name: zipkin
+  selector:
+    app: tempo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tempo-storage
+  namespace: momento-v5
+  labels:
+    app: tempo
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tempo
+  namespace: momento-v5
+  labels:
+    app: tempo

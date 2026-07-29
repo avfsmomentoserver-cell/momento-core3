@@ -1,0 +1,77 @@
+{
+  "project": {
+    "name": "Momento Core Platform",
+    "description": "Modular analytics and forecasting platform that collects, processes, analyzes, forecasts, and visualizes event streams in real time.",
+    "version": "4.0.0"
+  },
+  "default_agent": "ag_admin",
+  "entry_point_system": {
+    "enabled": true,
+    "default_entry_point": "all_prompts",
+    "skills_first": true,
+    "agent_coordination": true,
+    "entry_points": {
+      "v5": {
+        "workflow": "v5-transformation",
+        "description": "V5 Supersonic Realtime Transformation - Military Grade Commercial Platform",
+        "triggers": ["/v5", "/v5 research", "/v5 architecture", "/v5 deploy", "/v5 intelligence", "/v5 commercial"],
+        "coordinator": "ag_admin",
+        "specialists": ["ag_arch", "ag_backend", "ag_frontend", "ag_devops", "ag_forecast", "ag_qa"]
+      },
+      "admin": {
+        "workflow": "admin",
+        "description": "Admin workflow for vocabulary learning system management",
+        "triggers": ["/admin", "/admin vocabulary", "/admin features", "/admin discovery", "/admin learning", "/admin candidates"],
+        "coordinator": "ag_admin",
+        "specialists": ["ag_backend", "ag_forecast", "ag_docs"]
+      },
+      "v5_admin": {
+        "workflow": "v5_admin",
+        "description": "V5 free-tier administration and monitoring",
+        "triggers": ["/admin v5", "/admin v5 status", "/admin v5 optimize", "/admin v5 discovery", "/admin v5 health", "/admin v5 milestones"],
+        "coordinator": "ag_admin",
+        "specialists": ["ag_backend", "ag_devops", "ag_forecast"]
+      },
+      "all_prompts": {
+        "workflow": "standard-task",
+        "description": "Default entry point for all chat prompts",
+        "triggers": ["*"],
+        "coordinator": "ag_admin",
+        "specialists": []
+      }
+    }
+  },
+  "agents_config": "./AGENTS.md",
+  "skills_directory": "./skills/",
+  "workflows_directory": "./workflows/",
+  "coding_standards": "./CODING_STANDARDS.md",
+  "behavior": {
+    "fallback_hierarchy": [
+      "skills",
+      "project_admin",
+      "specialist_agents",
+      "general_purpose"
+    ],
+    "auto_skill_detection": true,
+    "collect_requirements_first": true,
+    "requirement_fields": [
+      "goal",
+      "scope",
+      "constraints",
+      "acceptance_criteria",
+      "timeline"
+    ]
+  },
+  "execution_modes": {
+    "low_credit_efficient": {
+      "keywords": ["efficient", "low credit", "budget", "cheap", "light"],
+      "max_depth": 2,
+      "prefer_skills": true
+    },
+    "full_power": {
+      "keywords": ["full power", "deep", "full control", "max", "thorough"],
+      "max_depth": 5,
+      "enable_full_handover": true
+    }
+  }
+}

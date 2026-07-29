@@ -1,0 +1,204 @@
+# Alertmanager Configuration for Momento Core V5
+# V5 Specification: Alertmanager 0.26+, multiple routes, grouping, inhibition
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: momento-v5
+  labels:
+    app: alertmanager
+    version: v5
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 5m
+      slack_api_url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+      pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+
+    templates:
+    - '/etc/alertmanager/templates/*.tmpl'
+
+    route:
+      receiver: 'default-receiver'
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 12h
+      routes:
+      # Critical alerts go to PagerDuty
+      - match:
+          severity: critical
+        receiver: 'pagerduty-critical'
+        continue: false
+
+      # Warning alerts go to Slack
+      - match:
+          severity: warning
+        receiver: 'slack-warnings'
+        continue: false
+
+      # Info alerts go to Slack with different channel
+      - match:
+          severity: info
+        receiver: 'slack-info'
+        continue: false
+
+      # System alerts go to system channel
+      - match:
+          category: system
+        receiver: 'slack-system'
+        continue: true
+
+      # Application alerts go to application channel
+      - match:
+          category: application
+        receiver: 'slack-application'
+        continue: true
+
+      # Database alerts go to database channel
+      - match:
+          category: database
+        receiver: 'slack-database'
+        continue: true
+
+      # Business alerts go to business channel
+      - match:
+          category: business
+        receiver: 'slack-business'
+        continue: true
+
+    # Inhibition rules
+    inhibit_rules:
+    # If a critical alert is firing, inhibit warnings for the same alert
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'instance']
+
+    # If a node is down, inhibit all alerts for that node
+    - source_match:
+        alertname: 'NodeDown'
+      target_match_re:
+        alertname: '.+'
+      equal: ['instance']
+
+    # If database is down, inhibit database-specific alerts
+    - source_match:
+        alertname: 'BackendDown'
+      target_match:
+        category: 'database'
+      equal: ['instance']
+
+    # Receivers
+    receivers:
+    - name: 'default-receiver'
+      slack_configs:
+      - channel: '#momento-alerts'
+        send_resolved: true
+        title: '{{ .GroupLabels.alertname }}'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+    - name: 'pagerduty-critical'
+      pagerduty_configs:
+      - service_key: 'YOUR_PAGERDUTY_SERVICE_KEY'
+        description: '{{ .GroupLabels.alertname }}'
+        severity: 'critical'
+        details:
+          firing: '{{ template "pagerduty.default.instances" .Alerts.Firing }}'
+          resolved: '{{ template "pagerduty.default.instances" .Alerts.Resolved }}'
+          num_firing: '{{ .Alerts.Firing | len }}'
+          num_resolved: '{{ .Alerts.Resolved | len }}'
+
+    - name: 'slack-warnings'
+      slack_configs:
+      - channel: '#momento-warnings'
+        send_resolved: true
+        title: '⚠️ Warning: {{ .GroupLabels.alertname }}'
+        color: 'warning'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+    - name: 'slack-info'
+      slack_configs:
+      - channel: '#momento-info'
+        send_resolved: true
+        title: 'ℹ️ Info: {{ .GroupLabels.alertname }}'
+        color: 'good'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          {{ end }}
+
+    - name: 'slack-system'
+      slack_configs:
+      - channel: '#momento-system'
+        send_resolved: true
+        title: '🖥️ System Alert: {{ .GroupLabels.alertname }}'
+        color: 'danger'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Instance:* {{ .Labels.instance }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+    - name: 'slack-application'
+      slack_configs:
+      - channel: '#momento-application'
+        send_resolved: true
+        title: '🚀 Application Alert: {{ .GroupLabels.alertname }}'
+        color: 'warning'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *App:* {{ .Labels.app }}
+          *Pod:* {{ .Labels.pod }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+    - name: 'slack-database'
+      slack_configs:
+      - channel: '#momento-database'
+        send_resolved: true
+        title: '💾 Database Alert: {{ .GroupLabels.alertname }}'
+        color: 'warning'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+
+    - name: 'slack-business'
+      slack_configs:
+      - channel: '#momento-business'
+        send_resolved: true
+        title: '📊 Business Alert: {{ .GroupLabels.alertname }}'
+        color: 'good'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
