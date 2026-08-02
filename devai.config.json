@@ -1,0 +1,141 @@
+{
+  "version": "1.0",
+  "project": "Momento TradingView Implementation",
+  "description": "Automated testing configuration for forex-style crash game analysis",
+  
+  "test_scenarios": [
+    {
+      "name": "Forex State Classification",
+      "type": "backend",
+      "module": "momento.linguistics",
+      "functions": ["classify_forex_state", "calculate_rsi"],
+      "input": {
+        "type": "random_multipliers",
+        "count": 50,
+        "min": 1.0,
+        "max": 50.0
+      },
+      "expected": {
+        "state": ["Ranging", "TrendingUp", "TrendingDown", "Breakout", "Reversal", "Consolidation", "FalseBreak"],
+        "rsi_range": [0, 100]
+      }
+    },
+    {
+      "name": "Support Resistance Detection",
+      "type": "backend",
+      "module": "momento.linguistics",
+      "functions": ["identify_support_resistance"],
+      "input": {
+        "type": "random_multipliers",
+        "count": 100,
+        "min": 1.0,
+        "max": 100.0
+      },
+      "expected": {
+        "has_support": true,
+        "has_resistance": true,
+        "has_pivot": true,
+        "fibonacci_levels": 7
+      }
+    },
+    {
+      "name": "Forecast Generation",
+      "type": "backend",
+      "module": "momento.forecast_forex",
+      "functions": ["forex_forecast", "forex_candidates"],
+      "input": {
+        "type": "random_multipliers",
+        "count": 100,
+        "min": 1.0,
+        "max": 50.0
+      },
+      "expected": {
+        "forecast_has_state": true,
+        "candidates_count_min": 3,
+        "probabilities_sum": 1.0
+      }
+    },
+    {
+      "name": "Candle Conversion",
+      "type": "backend",
+      "module": "momento.tradingview_adapter",
+      "functions": ["convert_to_candles"],
+      "input": {
+        "type": "random_multipliers",
+        "count": 100,
+        "timeframe": "5m"
+      },
+      "expected": {
+        "candles_have_ohlc": true,
+        "candles_count_positive": true
+      }
+    },
+    {
+      "name": "Pine Script Export",
+      "type": "backend",
+      "module": "momento.tradingview_adapter",
+      "functions": ["generate_pine_script"],
+      "input": {
+        "type": "candles",
+        "count": 50
+      },
+      "expected": {
+        "script_valid": true,
+        "contains_version": true,
+        "contains_indicator": true
+      }
+    },
+    {
+      "name": "UI Component Rendering",
+      "type": "frontend",
+      "component": "MomentoTradingViewFull",
+      "route": "/dashboard/tradingview-full",
+      "checks": [
+        "chart_renders",
+        "timeframe_switcher_works",
+        "drawing_tools_accessible",
+        "support_resistance_visible",
+        "forecast_panel_displays",
+        "round_list_updates"
+      ]
+    },
+    {
+      "name": "Multiplier Threshold Validation",
+      "type": "validation",
+      "description": "Ensure 50x and 10000x are treated differently",
+      "checks": [
+        "50x_used_as_event_threshold",
+        "10000x_used_as_config_limit",
+        "no_confusion_between_values"
+      ]
+    }
+  ],
+  
+  "ci_cd": {
+    "pre_commit_hooks": [
+      "python_tests",
+      "typescript_lint",
+      "dependency_check"
+    ],
+    "post_merge_tests": [
+      "integration_test_full_pipeline",
+      "ui_smoke_test",
+      "performance_benchmark"
+    ]
+  },
+  
+  "performance_targets": {
+    "state_classification_ms": 50,
+    "support_resistance_ms": 100,
+    "forecast_generation_ms": 200,
+    "candle_conversion_ms": 50,
+    "ui_render_ms": 500
+  },
+  
+  "data_requirements": {
+    "minimum_rounds_for_analysis": 20,
+    "recommended_rounds": 100,
+    "maximum_backtest_rounds": 10000,
+    "timeframe_buckets": ["1m", "5m", "15m", "1h", "4h", "1d"]
+  }
+}
